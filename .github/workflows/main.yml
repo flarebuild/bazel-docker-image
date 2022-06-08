@@ -4,6 +4,13 @@ name: bazel
 # GCP_SERVICE_ACCOUNT_EMAIL
 # GCP_SERVICE_ACCOUNT_KEY
 
+# Create IAM Role, create Service Account, bind role and obtain the key:
+# gcloud iam service-accounts create "github-actions-image-pusher" --display-name="GH Actions Image Pusher" --description="Account to push images via GitHub Actions" --project="flare-build"
+# gcloud iam roles create ImagePusher --project=flare-build --title=ImagePusher --description="Writes to Storage buckets" --permissions=storage.buckets.get,storage.multipartUploads.abort,storage.multipartUploads.create,storage.multipartUploads.list,storage.multipartUploads.listParts,storage.objects.create,storage.objects.delete,storage.objects.list
+# gcloud projects add-iam-policy-binding "flare-build" --member="serviceAccount:github-actions-image-pusher@flare-build.iam.gserviceaccount.com" --role="projects/flare-build/roles/ImagePusher" --condition=None
+# gcloud iam service-accounts keys create "/tmp/github-actions-image-pusher.json" --iam-account "github-actions-image-pusher@flare-build.iam.gserviceaccount.com"
+# base64 /tmp/github-actions-image-pusher.json && rm /tmp/github-actions-image-pusher.json
+
 env:
   REGISTRY: gcr.io
   GCP_PROJECT_ID: flare-build
