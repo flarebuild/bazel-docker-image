@@ -7,7 +7,11 @@ Bazel docker images from Google are heavily outdated and abandoned: [l.gcr.io/go
 Usage: 
 
 ```bash
-docker run -it --rm -v "$PWD":/app -v /var/run/docker.sock:/var/run/docker.sock -w /app --entrypoint=/bin/bash gcr.io/flare-build-alpha/bazelisk:latest
+docker run -it --rm -v "$PWD":/app \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v "$HOME/.cache/bazel-docker-bazelisk":/root/.cache/bazelisk \
+  -v "$HOME/.cache/bazel-docker-cache":/root/.cache/bazel \
+  -w /app --entrypoint=/bin/bash gcr.io/flare-build/bazel:latest
 ```
 
 Note: `docker.sock` is mapped to connect to the host Docker (if you need to run built images, etc.)
@@ -16,5 +20,5 @@ Note: `docker.sock` is mapped to connect to the host Docker (if you need to run 
 Drop into your `.zshrc`:
 
 ```bash
-alias docker-bazel='docker run -it --rm -v "$PWD":/app -v /var/run/docker.sock:/var/run/docker.sock -w /app --entrypoint=/bin/bash gcr.io/flare-build-alpha/bazelisk:latest'
+alias docker-bazel='docker run -it --rm -v "$PWD":/app -v /var/run/docker.sock:/var/run/docker.sock -v "$HOME/.cache/bazel-docker-bazelisk":/root/.cache/bazelisk -v "$HOME/.cache/bazel-docker-cache":/root/.cache/bazel -w /app --entrypoint=/bin/bash gcr.io/flare-build/bazel:latest'
 ```
