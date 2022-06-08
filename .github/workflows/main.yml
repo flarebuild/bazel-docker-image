@@ -1,0 +1,49 @@
+name: bazel
+
+# Required secrets:
+# GCP_SERVICE_ACCOUNT_EMAIL
+# GCP_SERVICE_ACCOUNT_KEY
+
+env:
+  REGISTRY: gcr.io
+  GCP_PROJECT_ID: flare-build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened]
+
+jobs:
+  push-image:
+    name: Push Image
+    # Skip workflow entirely for [skip ci] commits
+    if: |
+      false == contains(github.event.commits[0].message, '[skip ci]') &&
+      false == contains(github.event.commits[0].message, '[no ci]')
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Import Service Account key
+        run: echo "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}" | base64 -d > /tmp/auth.json
+
+      - name: GCloud Auth
+        run: |
+          gcloud --quiet auth \
+          activate-service-account "${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}" \
+          --key-file=/tmp/auth.json \
+          --project="${GCP_PROJECT_ID}"
+
+      - name: Docker Registry Auth
+        run: gcloud auth configure-docker
+
+      - name: Docker Build
+        run: docker build -t "${REGISTRY}/${GCP_PROJECT_ID}/bazel:latest" -f Dockerfile .
+
+      - name: Push Image
+        run: docker push "${REGISTRY}/${GCP_PROJECT_ID}/bazel:latest"
