@@ -1,4 +1,4 @@
-FROM ubuntu:bionic
+FROM ubuntu:jammy
 
 RUN apt-get update -y
 RUN apt-get install -y build-essential ca-certificates libssl-dev zlib1g-dev zip unzip
