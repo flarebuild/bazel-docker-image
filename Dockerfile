@@ -1,7 +1,7 @@
 FROM golang:1.18
 
 RUN apt-get update -y
-RUN apt-get install -y libssl-dev zlib1g-dev zip unzip
+RUN apt-get install -y build-essential libssl-dev zlib1g-dev zip unzip
 
 RUN go install github.com/bazelbuild/bazelisk@latest
 RUN go install github.com/bazelbuild/buildtools/buildifier@latest
