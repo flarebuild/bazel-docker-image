@@ -54,10 +54,13 @@ jobs:
       - name: Docker Registry Auth (GH)
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${REGISTRY_GH} -u $ --password-stdin
 
-      - name: Docker Build
-        run: docker build . --file Dockerfile --tag $IMAGE_NAME --label "runnumber=${GITHUB_RUN_ID}"
+      - name: Docker Build (Debian)
+        run: docker build . --file Dockerfile --tag $IMAGE_NAME:debian --label "runnumber=${GITHUB_RUN_ID}"
 
-      - name: Push Image
+      - name: Docker Build (Ubuntu)
+        run: docker build . --file ubuntu.Dockerfile --tag $IMAGE_NAME:ubuntu --label "runnumber=${GITHUB_RUN_ID}"
+
+      - name: Push Images
         run: |
           IMAGE_ID_GH=${REGISTRY_GH}/${{ github.repository_owner }}/$IMAGE_NAME
           IMAGE_ID_GCP=${REGISTRY_GCP}/${GCP_PROJECT_ID}/$IMAGE_NAME
@@ -69,9 +72,12 @@ jobs:
           [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
           # Use Docker `latest` tag convention
           [ "$VERSION" == "master" ] && VERSION=latest
-          echo IMAGE_ID=$IMAGE_ID
+          [ "$VERSION" == "main" ] && VERSION=latest
+          echo IMAGE_ID=$IMAGE_ID_GCP
           echo VERSION=$VERSION
-          docker tag $IMAGE_NAME $IMAGE_ID_GH:$VERSION
-          docker tag $IMAGE_NAME $IMAGE_ID_GCP:$VERSION
-          docker push $IMAGE_ID_GH:$VERSION
-          docker push $IMAGE_ID_GCP:$VERSION
+          docker tag $IMAGE_NAME:debian $IMAGE_ID_GCP:$VERSION
+          docker tag $IMAGE_NAME:debian $IMAGE_ID_GH:$VERSION
+          docker tag $IMAGE_NAME:ubuntu $IMAGE_ID_GCP:$VERSION-ubuntu
+          docker tag $IMAGE_NAME:ubuntu $IMAGE_ID_GH:$VERSION-ubuntu
+          docker push --all-tags $IMAGE_ID_GH:$VERSION
+          docker push --all-tags $IMAGE_ID_GCP:$VERSION
