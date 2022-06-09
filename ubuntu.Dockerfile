@@ -1,7 +1,7 @@
 FROM ubuntu:jammy
 
 RUN apt-get update -y
-RUN apt-get install -y build-essential ca-certificates libssl-dev zlib1g-dev zip unzip
+RUN apt-get install -y apt-utils build-essential ca-certificates libssl-dev zlib1g-dev zip unzip
 RUN apt-get install -y golang
 
 RUN go install github.com/bazelbuild/bazelisk@latest

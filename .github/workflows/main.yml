@@ -79,5 +79,5 @@ jobs:
           docker tag $IMAGE_NAME:debian $IMAGE_ID_GH:$VERSION
           docker tag $IMAGE_NAME:ubuntu $IMAGE_ID_GCP:$VERSION-ubuntu
           docker tag $IMAGE_NAME:ubuntu $IMAGE_ID_GH:$VERSION-ubuntu
-          docker push --all-tags $IMAGE_ID_GH:$VERSION
-          docker push --all-tags $IMAGE_ID_GCP:$VERSION
+          docker push --all-tags $IMAGE_ID_GH
+          docker push --all-tags $IMAGE_ID_GCP
