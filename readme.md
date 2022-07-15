@@ -13,7 +13,7 @@ docker run -it --rm -v "$PWD":/app \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v "$HOME/.cache/bazel-docker-bazelisk":/root/.cache/bazelisk \
   -v "$HOME/.cache/bazel-docker-cache":/root/.cache/bazel \
-  -w /app --entrypoint=/bin/bash gcr.io/flare-build/bazel:latest
+  -w /app --entrypoint=/bin/bash gcr.io/flare-build/bazel:latest-ubuntu
 
 # bazel build //...
 ```
