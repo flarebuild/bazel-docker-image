@@ -48,7 +48,8 @@ docker-bazel build //...
 ```
 
 Or, to gain shell access:
-```
+
+```bash
 # cd /some/bazel/workspace
 docker-bazel-bash
 root@31678cbd565a:/app# bazel build //...
