@@ -4,35 +4,52 @@ This is a simple [Bazelisk](https://github.com/bazelbuild/bazelisk) docker image
 
 Bazel docker images from Google are heavily outdated and abandoned: [l.gcr.io/google/bazel](https://console.cloud.google.com/gcr/images/cloud-marketplace-containers/GLOBAL/google/bazel). This is a drop-in replacement.
 
-Usage: 
+## Usage 
+
+```bash
+# cd /some/bazel/workspace 
+docker run --rm -v "$PWD":/app gcr.io/flare-build/bazel:latest build //...
+```
+
+ℹ️ Tip: To use docker from the host (if you need to run built images, etc.), provide mapping for `docker.sock`:
 
 ```bash
 # cd /some/bazel/workspace 
 
 docker run -it --rm -v "$PWD":/app \
   -v /var/run/docker.sock:/var/run/docker.sock \
-  -v "$HOME/.cache/bazel-docker-bazelisk":/root/.cache/bazelisk \
-  -v "$HOME/.cache/bazel-docker-cache":/root/.cache/bazel \
-  -w /app --entrypoint=/bin/bash gcr.io/flare-build/bazel:latest-ubuntu
+  --entrypoint=/bin/bash gcr.io/flare-build/bazel:latest-ubuntu
 
 # bazel build //...
 ```
 
-Note: `docker.sock` is mapped to connect to the host Docker (if you need to run built images, etc.)
-
-
-Put into your `.zshrc` / `.bashrc`:
+ℹ️ Tip: Additional mappings to preserve disk cache between runs:
 
 ```bash
-alias docker-bazel='docker run -it --rm -v "$PWD":/app -v /var/run/docker.sock:/var/run/docker.sock -v "$HOME/.cache/bazel-docker-bazelisk":/root/.cache/bazelisk -v "$HOME/.cache/bazel-docker-cache":/root/.cache/bazel -w /app --entrypoint=/bin/bash gcr.io/flare-build/bazel:latest'
+docker run -it --rm -v "$PWD":/app \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v "$HOME/.cache/bazel-docker-bazelisk":/root/.cache/bazelisk \
+  -v "$HOME/.cache/bazel-docker-cache":/root/.cache/bazel \
+  --entrypoint=/bin/bash gcr.io/flare-build/bazel:latest-ubuntu
 ```
 
-Use:
+Wrap all this in alias (put into your `.zshrc` / `.bashrc`):
 
 ```bash
-# cd /some/bazel/workspace 
+alias docker-bazel='docker run -it --rm -v "$PWD":/app -v /var/run/docker.sock:/var/run/docker.sock -v "$HOME/.cache/bazel-docker-bazelisk":/root/.cache/bazelisk -v "$HOME/.cache/bazel-docker-cache":/root/.cache/bazel gcr.io/flare-build/bazel:latest'
+alias docker-bazel-bash='docker run -it --rm -v "$PWD":/app -v /var/run/docker.sock:/var/run/docker.sock -v "$HOME/.cache/bazel-docker-bazelisk":/root/.cache/bazelisk -v "$HOME/.cache/bazel-docker-cache":/root/.cache/bazel --entrypoint=/bin/bash gcr.io/flare-build/bazel:latest'
+```
 
-docker-bazel
+Use aliased:
 
+```bash
+# cd /some/bazel/workspace
+docker-bazel build //...
+```
+
+Or, to gain shell access:
+```
+# cd /some/bazel/workspace
+docker-bazel-bash
 root@31678cbd565a:/app# bazel build //...
 ```
