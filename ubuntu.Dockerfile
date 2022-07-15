@@ -10,11 +10,8 @@ RUN go install github.com/bazelbuild/buildtools/buildifier@latest
 RUN ln -s "$HOME/go/bin/bazelisk" /usr/local/bin/bazel
 RUN ln -s "$HOME/go/bin/buildifier" /usr/local/bin/buildifier
 
-RUN git clone https://github.com/bazelbuild/bazel-watcher.git \
-    && cd bazel-watcher \
-    && git checkout v0.16.2 \
-    && bazel build //ibazel \
-    && cp bazel-bin/ibazel/ibazel_/ibazel /usr/local/bin/ibazel \
-    && cd .. && rm -rf bazel-watcher
+RUN curl --location --max-redirs 5 --output /usr/local/bin/ibazel \
+    https://github.com/bazelbuild/bazel-watcher/releases/download/v0.16.2/ibazel_linux_amd64 \
+    && chmod +x /usr/local/bin/ibazel
 
 CMD ["bazel"]
