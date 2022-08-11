@@ -2,9 +2,8 @@ FROM --platform=$BUILDPLATFORM debian:bullseye-slim AS build
 
 RUN apt update -y
 RUN apt install -y --no-install-recommends \
-    apt-utils build-essential ca-certificates gnupg lsb-release \
-    curl git zip unzip \
-    python-is-python3
+    apt-utils ca-certificates gnupg lsb-release \
+    curl git python-is-python3
 
 ARG BUILDARCH
 
@@ -43,14 +42,11 @@ RUN for TOOLNAME in buildifier buildozer unused_deps; do \
             --output $TOOLNAME && chmod +x $TOOLNAME; \
     done
 
+
 FROM debian:bullseye-slim
 
-COPY --from=build /src/docker.gpg /etc/apt/keyrings/docker.gpg
-COPY --from=build /src/docker.list /etc/apt/sources.list.d/docker.list
-
-RUN apt update -y
-RUN apt install -y --no-install-recommends \
-    apt-utils build-essential ca-certificates \
+RUN apt update -y && apt install -y --no-install-recommends \
+    build-essential ca-certificates \
     curl git zip unzip
 
 COPY --from=build /src/bazel /usr/local/bin/
@@ -59,7 +55,9 @@ COPY --from=build /src/bazel-watcher/bazel-bin/ibazel/ibazel_/ibazel /usr/local/
 
 # Docker CLI
 # Use with mapping from the host: `docker run -it --rm -v /var/run/docker.sock:/var/run/docker.sock ...`
-RUN apt install -y --no-install-recommends docker-ce-cli
+COPY --from=build /src/docker.gpg /etc/apt/keyrings/docker.gpg
+COPY --from=build /src/docker.list /etc/apt/sources.list.d/docker.list
+RUN apt update -y && apt install -y --no-install-recommends docker-ce-cli
 
 WORKDIR /app
 ENTRYPOINT ["bazel"]
