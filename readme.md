@@ -18,7 +18,7 @@ docker run --rm -v "$PWD":/app gcr.io/flare-build/bazel:latest build //...
 
 docker run -it --rm -v "$PWD":/app \
   -v /var/run/docker.sock:/var/run/docker.sock \
-  --entrypoint=/bin/bash gcr.io/flare-build/bazel:latest-ubuntu
+  --entrypoint=/bin/bash gcr.io/flare-build/bazel:latest
 
 # bazel build //...
 ```
@@ -30,7 +30,7 @@ docker run -it --rm -v "$PWD":/app \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v "$HOME/.cache/bazel-docker-bazelisk":/root/.cache/bazelisk \
   -v "$HOME/.cache/bazel-docker-cache":/root/.cache/bazel \
-  --entrypoint=/bin/bash gcr.io/flare-build/bazel:latest-ubuntu
+  --entrypoint=/bin/bash gcr.io/flare-build/bazel:latest
 ```
 
 Wrap all this in alias (put into your `.zshrc` / `.bashrc`):

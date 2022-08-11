@@ -7,30 +7,35 @@ RUN apt install -y --no-install-recommends \
     curl git zip unzip \
     python-is-python3
 
+WORKDIR /tmp
+ARG TARGETOS TARGETARCH
+
 RUN curl --location --max-redirs 5 \
-    https://github.com/bazelbuild/bazelisk/releases/download/v1.12.0/bazelisk-linux-amd64 \
+    https://github.com/bazelbuild/bazelisk/releases/download/v1.12.0/bazelisk-linux-$TARGETARCH \
     --output /usr/local/bin/bazel \
     && chmod +x /usr/local/bin/bazel
 
-RUN curl --location --max-redirs 5 \
-    https://github.com/bazelbuild/bazel-watcher/releases/download/v0.16.2/ibazel_linux_amd64 \
-    --output /usr/local/bin/ibazel \
-    && chmod +x /usr/local/bin/ibazel
+RUN git clone https://github.com/bazelbuild/bazel-watcher.git \
+    && cd bazel-watcher \
+    && git checkout v0.18.0 \
+    && bazel build //ibazel \
+    && cp bazel-bin/ibazel/ibazel_/ibazel /usr/local/bin/ibazel \
+    && cd .. && rm -rf bazel-watcher
 
 ARG BUILDTOOLS_VERSION="5.1.0"
 
 RUN curl --location --max-redirs 5 \
-    https://github.com/bazelbuild/buildtools/releases/download/$BUILDTOOLS_VERSION/buildifier-linux-amd64 \
+    https://github.com/bazelbuild/buildtools/releases/download/$BUILDTOOLS_VERSION/buildifier-linux-$TARGETARCH \
     --output /usr/local/bin/buildifier \
     && chmod +x /usr/local/bin/buildifier
 
 RUN curl --location --max-redirs 5 \
-    https://github.com/bazelbuild/buildtools/releases/download/$BUILDTOOLS_VERSION/buildozer-linux-amd64 \
+    https://github.com/bazelbuild/buildtools/releases/download/$BUILDTOOLS_VERSION/buildozer-linux-$TARGETARCH \
     --output /usr/local/bin/buildozer \
     && chmod +x /usr/local/bin/buildozer
 
 RUN curl --location --max-redirs 5 \
-    https://github.com/bazelbuild/buildtools/releases/download/$BUILDTOOLS_VERSION/unused_deps-linux-amd64 \
+    https://github.com/bazelbuild/buildtools/releases/download/$BUILDTOOLS_VERSION/unused_deps-linux-$TARGETARCH \
     --output /usr/local/bin/unused_deps \
     && chmod +x /usr/local/bin/unused_deps
 

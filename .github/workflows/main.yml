@@ -12,10 +12,7 @@ name: bazel
 # base64 /tmp/github-actions-image-pusher.json && rm /tmp/github-actions-image-pusher.json
 
 env:
-  REGISTRY_GCP: gcr.io
-  REGISTRY_GH: ghcr.io
   GCP_PROJECT_ID: flare-build
-  IMAGE_NAME: bazel
 
 on:
   push:
@@ -51,33 +48,7 @@ jobs:
       - name: Docker Registry Auth (GCP)
         run: gcloud auth configure-docker
 
-      - name: Docker Registry Auth (GH)
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${REGISTRY_GH} -u $ --password-stdin
-
-      - name: Docker Build (Debian)
-        run: docker build . --file Dockerfile --tag $IMAGE_NAME:debian --label "runnumber=${GITHUB_RUN_ID}"
-
-      - name: Docker Build (Ubuntu)
-        run: docker build . --file ubuntu.Dockerfile --tag $IMAGE_NAME:ubuntu --label "runnumber=${GITHUB_RUN_ID}"
-
-      - name: Push Images
+      - name: Build and push
         run: |
-          IMAGE_ID_GH=${REGISTRY_GH}/${{ github.repository_owner }}/$IMAGE_NAME
-          IMAGE_ID_GCP=${REGISTRY_GCP}/${GCP_PROJECT_ID}/$IMAGE_NAME
-          # Change all uppercase to lowercase
-          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
-          # Strip git ref prefix from version
-          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-          # Strip "v" prefix from tag name
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-          # Use Docker `latest` tag convention
-          [ "$VERSION" == "master" ] && VERSION=latest
-          [ "$VERSION" == "main" ] && VERSION=latest
-          echo IMAGE_ID=$IMAGE_ID_GCP
-          echo VERSION=$VERSION
-          docker tag $IMAGE_NAME:debian $IMAGE_ID_GCP:$VERSION
-          docker tag $IMAGE_NAME:debian $IMAGE_ID_GH:$VERSION
-          docker tag $IMAGE_NAME:ubuntu $IMAGE_ID_GCP:$VERSION-ubuntu
-          docker tag $IMAGE_NAME:ubuntu $IMAGE_ID_GH:$VERSION-ubuntu
-          docker push --all-tags $IMAGE_ID_GH
-          docker push --all-tags $IMAGE_ID_GCP
+          docker buildx create --platform linux/amd64,linux/arm64 --use
+          docker buildx build --push --platform linux/amd64,linux/arm64 -t gcr.io/flare-build/bazel:latest .
