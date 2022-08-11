@@ -1,9 +1,9 @@
 FROM --platform=$BUILDPLATFORM debian:bullseye-slim AS build
 
-RUN apt update -y
-RUN apt install -y --no-install-recommends \
-    apt-utils ca-certificates gnupg lsb-release \
-    curl git python-is-python3
+RUN apt update -y && apt install -y --no-install-recommends \
+    build-essential ca-certificates gnupg lsb-release \
+    curl git zip unzip \
+    python-is-python3
 
 ARG BUILDARCH
 
