@@ -1,9 +1,11 @@
 FROM --platform=$BUILDPLATFORM debian:bullseye-slim AS build
 
-RUN apt update -y && apt install -y --no-install-recommends \
-    build-essential ca-certificates gnupg lsb-release \
-    curl git zip unzip \
-    python-is-python3
+RUN apt update -y \
+    && apt install -y --no-install-recommends \
+        build-essential ca-certificates \
+        curl git zip unzip \
+        python-is-python3 \
+        gnupg lsb-release
 
 ARG BUILDARCH
 
@@ -45,9 +47,11 @@ RUN for TOOLNAME in buildifier buildozer unused_deps; do \
 
 FROM debian:bullseye-slim
 
-RUN apt update -y && apt install -y --no-install-recommends \
-    build-essential ca-certificates \
-    curl git zip unzip
+RUN apt update -y \
+    && apt install -y --no-install-recommends \
+        build-essential ca-certificates \
+        curl git zip unzip \
+        python-is-python3
 
 COPY --from=build /src/bazel /usr/local/bin/
 COPY --from=build /buildtools/* /usr/local/bin/
