@@ -6,18 +6,18 @@ RUN apt install -y --no-install-recommends \
     curl git zip unzip \
     python-is-python3
 
+ARG BUILDARCH TARGETARCH
+
 RUN curl --location --max-redirs 5 \
     https://github.com/bazelbuild/bazelisk/releases/download/v1.12.0/bazelisk-linux-$BUILDARCH \
     --output /usr/local/bin/bazel \
     && chmod +x /usr/local/bin/bazel
 
-ARG TARGETOS TARGETARCH
-
 WORKDIR /src
 
 RUN git clone https://github.com/bazelbuild/bazel-watcher.git \
     && cd bazel-watcher \
-    && git checkout v0.18.0 \
+    && git -c advice.detachedHead=false checkout v0.18.0 \
     && bazel build //ibazel --platforms=@io_bazel_rules_go//go/toolchain:linux_$TARGETARCH
 
 WORKDIR /dist
