@@ -18,7 +18,7 @@ WORKDIR /src
 RUN git clone https://github.com/bazelbuild/bazel-watcher.git \
     && cd bazel-watcher \
     && git checkout v0.18.0 \
-    && bazel build //ibazel
+    && bazel build //ibazel --platforms=@io_bazel_rules_go//go/toolchain:linux_$TARGETARCH
 
 ARG BUILDTOOLS_VERSION="5.1.0"
 
