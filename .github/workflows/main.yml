@@ -11,9 +11,6 @@ name: bazel
 # gcloud iam service-accounts keys create "/tmp/github-actions-image-pusher.json" --iam-account "github-actions-image-pusher@flare-build.iam.gserviceaccount.com"
 # cat /tmp/github-actions-image-pusher.json | jq -r tostring && rm /tmp/github-actions-image-pusher.json
 
-env:
-  GCP_PROJECT_ID: flare-build
-
 on:
   push:
     branches:
@@ -43,6 +40,8 @@ jobs:
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v2
+        with:
+          platforms: "arm64"
       -
         name: Set up Docker Buildx
         id: buildx
@@ -81,6 +80,6 @@ jobs:
           platforms: linux/amd64,linux/arm64
           builder: ${{ steps.buildx.outputs.name }}
           push: true
-          tags:  gcr.io/flare-build/bazel:latest
+          tags: gcr.io/flare-build/bazel:latest
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
